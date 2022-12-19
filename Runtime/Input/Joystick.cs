@@ -15,6 +15,9 @@ public class Joystick : MonoBehaviour
 
 	[SerializeField] private bool _logOutput;
 
+	public float X => _direction.x;
+	public float Y => _direction.y;
+	
 	private void Awake()
 	{
 		_cap = GetComponentInChildren<JoystickCap>();
