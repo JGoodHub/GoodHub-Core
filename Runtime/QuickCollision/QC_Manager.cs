@@ -54,7 +54,7 @@ namespace GoodHub.Core.Runtime.QuickCollision
                     if (colliderA == colliderB)
                         continue;
 
-                    if (colliderA.GetWorldBounds().Intersects(colliderB.GetWorldBounds()) == false)
+                    if (colliderA.GetBounds().Intersects(colliderB.GetBounds()) == false)
                         continue;
 
                     IntersectionPair intersectionPair = new IntersectionPair(colliderA, colliderB);
@@ -75,7 +75,7 @@ namespace GoodHub.Core.Runtime.QuickCollision
 
             foreach (IntersectionPair intersectionPair in broadPhaseIntersections)
             {
-                if (intersectionPair.ColliderA.CheckForCollision(intersectionPair.ColliderB))
+                if (intersectionPair.ColliderA.IsOverlapping(intersectionPair.ColliderB))
                 {
                     narrowPhaseIntersections.Add(intersectionPair);
                 }

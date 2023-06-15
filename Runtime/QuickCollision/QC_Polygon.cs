@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace GoodHub.Core.Runtime.QuickCollision
 {
-    public class QC_ConvexPolygon
+    public class QC_Polygon
     {
         private readonly Vector2[] _points;
         private Vector2[] _normals;
@@ -14,7 +14,7 @@ namespace GoodHub.Core.Runtime.QuickCollision
 
         public Bounds Bounds => _bounds;
 
-        public QC_ConvexPolygon(Vector2[] points)
+        public QC_Polygon(Vector2[] points)
         {
             if (points == null || points.Length <= 2)
                 throw new Exception("points number be not null and contain at least 3 vectors");
@@ -61,15 +61,37 @@ namespace GoodHub.Core.Runtime.QuickCollision
             return true;
         }
 
-        public bool CheckForIntersection(QC_ConvexPolygon otherPolygon)
+        public bool IsOverlapping(QC_Polygon otherPolygon)
         {
-            
-            
-            
-            
-            
-            
-            
+            if (SeparatingAxisExist(otherPolygon) || otherPolygon.SeparatingAxisExist(this))
+                return false;
+
+            return true;
+        }
+        
+        private bool SeparatingAxisExist(QC_Polygon otherPolygon)
+        {
+            for (int i = 0; i < _points.Length; i++)
+            {
+                int nextIndex = (i + 1) % _points.Length;
+                Vector2 origin = _points[i];
+                Vector2 direction = _points[nextIndex] - origin;
+                Vector2 normal = Vector3.Cross(direction, -Vector3.forward).normalized;
+
+                bool separateAxisFound = true;
+                for (int j = 0; j < otherPolygon.Points.Length; j++)
+                {
+                    if (Vector2.Dot(normal, otherPolygon.Points[j] - origin) <= 0f)
+                        separateAxisFound = false;
+
+                    if (separateAxisFound == false)
+                        break;
+                }
+
+                if (separateAxisFound)
+                    return true;
+            }
+
             return false;
         }
     }

@@ -23,8 +23,8 @@ namespace GoodHub.Core.Runtime.QuickCollision
             QC_Manager.UnregisterCollider(this);
         }
 
-        public abstract Bounds GetWorldBounds();
+        public abstract Bounds GetBounds(bool world = true);
 
-        public abstract bool CheckForCollision(QC_Collider other);
+        public abstract bool IsOverlapping(QC_Collider other);
     }
 }
