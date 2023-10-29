@@ -22,7 +22,7 @@ namespace GoodHub.Core.Runtime
 
         protected virtual void Start()
         {
-            SelectionController.Instance.RegisterEntity(this);
+            SelectionController.Singleton.RegisterEntity(this);
             SetSelected(false);
 
             id = Random.Range(0, 1000000);
@@ -30,7 +30,7 @@ namespace GoodHub.Core.Runtime
 
         private void OnDestroy()
         {
-            SelectionController.Instance.UnregisterEntity(this);
+            SelectionController.Singleton.UnregisterEntity(this);
         }
 
         public void SetSelected(bool state)

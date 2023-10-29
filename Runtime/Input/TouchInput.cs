@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 
 namespace GoodHub.Core.Runtime
 {
-    public class TouchInput : GlobalSingleton<TouchInput>
+    public class TouchInput : SceneSingleton<TouchInput>
     {
         public struct TouchData
         {
@@ -15,32 +15,42 @@ namespace GoodHub.Core.Runtime
             public Vector2 UpPosition;
 
             public bool IsDragging;
-            public float CurrentDragDistance;
+            public float TotalDragDistance;
+            //public float FrameDragDistance;
 
             public bool DownOverUI;
             public bool CurrentlyOverUI;
             public bool UpOverUI;
         }
 
-        public delegate void TouchDelegate(TouchData touchData);
+        #region Events
         
+        public delegate void TouchDelegate(TouchData touchData);
+
         public static event TouchDelegate OnTouchDown;
+
         public static event TouchDelegate OnTouchUp;
+
         public static event TouchDelegate OnTouchClick;
 
         public static event TouchDelegate OnTouchDragEnter;
+
         public static event TouchDelegate OnTouchDragStay;
-        public static event TouchDelegate OnTouchDragEnd;
+
+        public static event TouchDelegate OnTouchDragExit;
+        
+        #endregion
 
         public float _relativeDistanceToDrag = 0.04f;
         private float _pixelDistanceToDrag;
 
         private static TouchData _frameTouchData;
+
         public static TouchData FrameTouchData => _frameTouchData;
 
         public bool debugEvents;
 
-        private void Awake()
+        protected void Awake()
         {
             _pixelDistanceToDrag = Mathf.Sqrt(Mathf.Pow(Screen.width, 2) + Mathf.Pow(Screen.height, 2)) * _relativeDistanceToDrag;
         }
@@ -57,9 +67,9 @@ namespace GoodHub.Core.Runtime
 
             if (Input.GetMouseButton(0))
             {
-                _frameTouchData.CurrentDragDistance = Vector2.Distance(_frameTouchData.DownPosition, _frameTouchData.CurrentPosition);
+                _frameTouchData.TotalDragDistance = Vector2.Distance(_frameTouchData.DownPosition, _frameTouchData.CurrentPosition);
 
-                if (_frameTouchData.IsDragging || _frameTouchData.CurrentDragDistance >= _pixelDistanceToDrag)
+                if (_frameTouchData.IsDragging || _frameTouchData.TotalDragDistance >= _pixelDistanceToDrag)
                 {
                     if (!_frameTouchData.IsDragging)
                     {
@@ -76,14 +86,14 @@ namespace GoodHub.Core.Runtime
                     TriggerTouchDragExit();
                 }
 
-                _frameTouchData.CurrentDragDistance = 0;
+                _frameTouchData.TotalDragDistance = 0;
             }
 
             if (Input.GetMouseButtonUp(0))
             {
                 TriggerTouchUp();
 
-                if (_frameTouchData.CurrentDragDistance < _pixelDistanceToDrag)
+                if (_frameTouchData.TotalDragDistance < _pixelDistanceToDrag)
                 {
                     TriggerTouchClick();
                 }
@@ -145,7 +155,7 @@ namespace GoodHub.Core.Runtime
         {
             _frameTouchData.IsDragging = false;
 
-            OnTouchDragEnd?.Invoke(_frameTouchData);
+            OnTouchDragExit?.Invoke(_frameTouchData);
 
             if (debugEvents)
                 Debug.Log("[DragCameraController]: Touch Drag Exit Triggered");

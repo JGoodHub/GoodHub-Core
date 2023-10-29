@@ -16,7 +16,7 @@ namespace GoodHub.Core.Runtime
 
         // Properties
 
-        public static SelectableEntity SelectedEntity => Instance._selectedEntity;
+        public static SelectableEntity SelectedEntity => Singleton._selectedEntity;
 
         // Events
 
@@ -43,7 +43,7 @@ namespace GoodHub.Core.Runtime
         public void UnregisterEntity(SelectableEntity entity)
         {
             if (entity == SelectedEntity)
-                Instance.ClearSelection();
+                Singleton.ClearSelection();
 
             if (_allEntities.Contains(entity))
                 _allEntities.Remove(entity);
