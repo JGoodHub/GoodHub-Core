@@ -9,11 +9,10 @@ namespace GoodHub.Core.Runtime
 
     public class SelectableEntity : MonoBehaviour
     {
-
         [Header("Entity")]
         public new string name;
         public int id;
-        public Type type;
+
         [Space]
         [SerializeField] private GameObject selectionRing;
         [SerializeField] private float selectionRadius;
@@ -30,7 +29,8 @@ namespace GoodHub.Core.Runtime
 
         private void OnDestroy()
         {
-            SelectionController.Singleton.UnregisterEntity(this);
+            if (SelectionController.Singleton)
+                SelectionController.Singleton.UnregisterEntity(this);
         }
 
         public void SetSelected(bool state)
@@ -38,7 +38,6 @@ namespace GoodHub.Core.Runtime
             if (selectionRing != null)
                 selectionRing.SetActive(state);
         }
-
     }
 
 }

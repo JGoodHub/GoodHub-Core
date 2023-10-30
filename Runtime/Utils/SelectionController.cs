@@ -13,12 +13,10 @@ namespace GoodHub.Core.Runtime
         private HashSet<SelectableEntity> _allEntities = new HashSet<SelectableEntity>();
 
         private SelectableEntity _selectedEntity;
-
-        // Properties
-
-        public static SelectableEntity SelectedEntity => Singleton._selectedEntity;
-
-        // Events
+        
+        
+        public SelectableEntity SelectedEntity => _selectedEntity;
+        
 
         public delegate void SelectionChange(object sender, SelectableEntity oldEntity, SelectableEntity newEntity);
 
