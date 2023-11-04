@@ -47,51 +47,37 @@ namespace GoodHub.Core.Runtime.UI
 
             Vector2 baseSizeDelta = _expandablePanel.sizeDelta;
 
-            AsyncTween.Lerp(0f, 1f, _transitionDuration, interpolate =>
-            {
-                Vector2 newSizeDelta = Vector2.Lerp(baseSizeDelta, _expandedSize, interpolate);
-                _expandablePanel.sizeDelta = newSizeDelta;
-            }, () =>
-            {
-                _isExpanded = true;
-                _isTweening = false;
-
-                _collapsedContent.SetActive(false);
-            }, new Dictionary<float, Action>
-            {
+            AsyncTween.Lerp(0f, 1f, _transitionDuration,
+                interpolate =>
                 {
-                    _transitionDuration * 0.75f, () =>
-                    {
-                        AsyncTween.Lerp(0f, 1f, _transitionDuration * 0.25f, expandedAlpha =>
-                        {
-                            _expandedCanvasGroup.alpha = expandedAlpha;
-                        });
-                    }
+                    Vector2 newSizeDelta = Vector2.Lerp(baseSizeDelta, _expandedSize, interpolate);
+                    _expandablePanel.sizeDelta = newSizeDelta;
                 },
-            });
+                () =>
+                {
+                    _isExpanded = true;
+                    _isTweening = false;
+
+                    _collapsedContent.SetActive(false);
+                },
+                new Dictionary<float, Action>
+                {
+                    {
+                        _transitionDuration * 0.75f, () =>
+                        {
+                            AsyncTween.Lerp(0f, 1f, _transitionDuration * 0.25f, expandedAlpha =>
+                            {
+                                _expandedCanvasGroup.alpha = expandedAlpha;
+                            });
+                        }
+                    },
+                }
+            );
 
             AsyncTween.Lerp(1f, 0f, _transitionDuration * 0.25f, collapsedAlpha =>
             {
                 _collapsedCanvasGroup.alpha = collapsedAlpha;
             });
-
-            // _expandablePanel
-            //     .DOSizeDelta(_expandedSize, _transitionDuration)
-            //     .SetEase(Ease.OutQuart)
-            //     .OnComplete(() =>
-            //     {
-            //         _isExpanded = true;
-            //         _isTweening = false;
-            //
-            //         _collapsedContent.SetActive(false);
-            //     });
-            //
-            // _collapsedCanvasGroup.DOFade(0f, _transitionDuration * 0.25f);
-            //
-            // DOVirtual.DelayedCall(_transitionDuration * 0.75f, () =>
-            // {
-            //     _expandedCanvasGroup.DOFade(1f, _transitionDuration * 0.25f);
-            // });
         }
 
         private void Collapse()
@@ -107,23 +93,39 @@ namespace GoodHub.Core.Runtime.UI
             _expandedCanvasGroup.alpha = 1f;
             _collapsedCanvasGroup.alpha = 0f;
 
-            // _expandablePanel
-            //     .DOSizeDelta(_collapsedSize, _transitionDuration)
-            //     .SetEase(Ease.OutQuart)
-            //     .OnComplete(() =>
-            //     {
-            //         _isExpanded = false;
-            //         _isTweening = false;
-            //
-            //         _expandedContent.SetActive(false);
-            //     });
-            //
-            // _expandedCanvasGroup.DOFade(0f, _transitionDuration * 0.25f);
-            //
-            // DOVirtual.DelayedCall(_transitionDuration * 0.75f, () =>
-            // {
-            //     _collapsedCanvasGroup.DOFade(1f, _transitionDuration * 0.25f);
-            // });
+            Vector2 baseSizeDelta = _expandablePanel.sizeDelta;
+
+            AsyncTween.Lerp(0f, 1f, _transitionDuration,
+                interpolate =>
+                {
+                    Vector2 newSizeDelta = Vector2.Lerp(baseSizeDelta, _collapsedSize, interpolate);
+                    _expandablePanel.sizeDelta = newSizeDelta;
+                },
+                () =>
+                {
+                    _isExpanded = false;
+                    _isTweening = false;
+
+                    _expandedContent.SetActive(false);
+                },
+                new Dictionary<float, Action>
+                {
+                    {
+                        _transitionDuration * 0.75f, () =>
+                        {
+                            AsyncTween.Lerp(0f, 1f, _transitionDuration * 0.25f, collapsedAlpha =>
+                            {
+                                _collapsedCanvasGroup.alpha = collapsedAlpha;
+                            });
+                        }
+                    },
+                }
+            );
+
+            AsyncTween.Lerp(1f, 0f, _transitionDuration * 0.25f, expandedAlpha =>
+            {
+                _expandedCanvasGroup.alpha = expandedAlpha;
+            });
         }
 
         private void SetToExpandedState(bool snap = false)
