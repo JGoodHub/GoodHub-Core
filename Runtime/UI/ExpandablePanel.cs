@@ -64,7 +64,8 @@ namespace GoodHub.Core.Runtime.UI
                     {
                         _expandedCanvasGroup.alpha = expandedAlpha;
                     });
-                });
+                })
+                .SetEasing(Easing.OutQuart);
 
             AsyncTween.Float(1f, 0f, _transitionDuration * 0.25f, collapsedAlpha =>
             {
@@ -78,6 +79,7 @@ namespace GoodHub.Core.Runtime.UI
                 return;
 
             _isTweening = true;
+            float transitionDurationQuarter = _transitionDuration * 0.25f;
 
             _expandedContent.SetActive(true);
             _collapsedContent.SetActive(true);
@@ -98,18 +100,13 @@ namespace GoodHub.Core.Runtime.UI
 
                     _expandedContent.SetActive(false);
                 })
-                .AddTrigger(_transitionDuration * 0.75f, () =>
+                .AddTrigger(_transitionDuration - transitionDurationQuarter, () =>
                 {
-                    AsyncTween.Float(0f, 1f, _transitionDuration * 0.25f, collapsedAlpha =>
-                    {
-                        _collapsedCanvasGroup.alpha = collapsedAlpha;
-                    });
-                });
+                    AsyncTween.Float(0f, 1f, transitionDurationQuarter, collapsedAlpha => _collapsedCanvasGroup.alpha = collapsedAlpha);
+                })
+                .SetEasing(Easing.OutQuart);
 
-            AsyncTween.Float(1f, 0f, _transitionDuration * 0.25f, expandedAlpha =>
-            {
-                _expandedCanvasGroup.alpha = expandedAlpha;
-            });
+            AsyncTween.Float(1f, 0f, transitionDurationQuarter, expandedAlpha => _expandedCanvasGroup.alpha = expandedAlpha);
         }
 
         private void SetToExpandedState(bool snap = false)

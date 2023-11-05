@@ -20,18 +20,14 @@ namespace GoodHub.Core.Runtime.Utils
         public static Tweener Float(float from, float to, float duration, Action<float> stepCallback)
         {
             Tweener tweener = new Tweener(stepCallback);
-
             _routineRunner.StartCoroutine(LerpRoutine(from, to, duration, tweener, 0f));
-
             return tweener;
         }
 
         public static Tweener DelayedFloat(float from, float to, float duration, Action<float> stepCallback, float delay)
         {
             Tweener tweener = new Tweener(stepCallback);
-
             _routineRunner.StartCoroutine(LerpRoutine(from, to, duration, tweener, delay));
-
             return tweener;
         }
 
@@ -66,7 +62,8 @@ namespace GoodHub.Core.Runtime.Utils
             while (time < duration)
             {
                 float progress = time * inverseDuration;
-                float interpolate = from + (delta * progress);
+                float easedProgress = EasingUtil.Ease(progress, tweener.Easing);
+                float interpolate = from + (delta * easedProgress);
 
                 try
                 {
@@ -116,14 +113,12 @@ namespace GoodHub.Core.Runtime.Utils
 
     public class Tweener
     {
-        private float _delay;
-
         private Action _startedCallback;
         private Action<float> _steppedCallback;
         private Action _completedCallback;
         private Dictionary<float, Action> _triggerCallbacks = new Dictionary<float, Action>();
 
-        public float Delay => _delay;
+        private Easing _easing;
 
         public Action StartedCallback => _startedCallback;
 
@@ -133,15 +128,11 @@ namespace GoodHub.Core.Runtime.Utils
 
         public Dictionary<float, Action> TriggerCallbacks => _triggerCallbacks;
 
+        public Easing Easing => _easing;
+
         public Tweener(Action<float> steppedCallback)
         {
             _steppedCallback = steppedCallback;
-        }
-
-        public Tweener SetDelay(float delay)
-        {
-            _delay = delay;
-            return this;
         }
 
         public Tweener OnStarted(Action callback)
@@ -162,8 +153,9 @@ namespace GoodHub.Core.Runtime.Utils
             return this;
         }
 
-        public Tweener SetEasing()
+        public Tweener SetEasing(Easing easing)
         {
+            _easing = easing;
             return this;
         }
 
