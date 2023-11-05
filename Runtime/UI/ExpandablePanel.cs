@@ -47,34 +47,26 @@ namespace GoodHub.Core.Runtime.UI
 
             Vector2 baseSizeDelta = _expandablePanel.sizeDelta;
 
-            AsyncTween.Lerp(0f, 1f, _transitionDuration,
-                interpolate =>
+            AsyncTween.Vector2(baseSizeDelta, _expandedSize, _transitionDuration, newSizeDelta =>
                 {
-                    Vector2 newSizeDelta = Vector2.Lerp(baseSizeDelta, _expandedSize, interpolate);
                     _expandablePanel.sizeDelta = newSizeDelta;
-                },
-                () =>
+                })
+                .OnCompleted(() =>
                 {
                     _isExpanded = true;
                     _isTweening = false;
 
                     _collapsedContent.SetActive(false);
-                },
-                new Dictionary<float, Action>
+                })
+                .AddTrigger(_transitionDuration * 0.75f, () =>
                 {
+                    AsyncTween.Float(0f, 1f, _transitionDuration * 0.25f, expandedAlpha =>
                     {
-                        _transitionDuration * 0.75f, () =>
-                        {
-                            AsyncTween.Lerp(0f, 1f, _transitionDuration * 0.25f, expandedAlpha =>
-                            {
-                                _expandedCanvasGroup.alpha = expandedAlpha;
-                            });
-                        }
-                    },
-                }
-            );
+                        _expandedCanvasGroup.alpha = expandedAlpha;
+                    });
+                });
 
-            AsyncTween.Lerp(1f, 0f, _transitionDuration * 0.25f, collapsedAlpha =>
+            AsyncTween.Float(1f, 0f, _transitionDuration * 0.25f, collapsedAlpha =>
             {
                 _collapsedCanvasGroup.alpha = collapsedAlpha;
             });
@@ -95,34 +87,26 @@ namespace GoodHub.Core.Runtime.UI
 
             Vector2 baseSizeDelta = _expandablePanel.sizeDelta;
 
-            AsyncTween.Lerp(0f, 1f, _transitionDuration,
-                interpolate =>
+            AsyncTween.Vector2(baseSizeDelta, _collapsedSize, _transitionDuration, newSizeDelta =>
                 {
-                    Vector2 newSizeDelta = Vector2.Lerp(baseSizeDelta, _collapsedSize, interpolate);
                     _expandablePanel.sizeDelta = newSizeDelta;
-                },
-                () =>
+                })
+                .OnCompleted(() =>
                 {
                     _isExpanded = false;
                     _isTweening = false;
 
                     _expandedContent.SetActive(false);
-                },
-                new Dictionary<float, Action>
+                })
+                .AddTrigger(_transitionDuration * 0.75f, () =>
                 {
+                    AsyncTween.Float(0f, 1f, _transitionDuration * 0.25f, collapsedAlpha =>
                     {
-                        _transitionDuration * 0.75f, () =>
-                        {
-                            AsyncTween.Lerp(0f, 1f, _transitionDuration * 0.25f, collapsedAlpha =>
-                            {
-                                _collapsedCanvasGroup.alpha = collapsedAlpha;
-                            });
-                        }
-                    },
-                }
-            );
+                        _collapsedCanvasGroup.alpha = collapsedAlpha;
+                    });
+                });
 
-            AsyncTween.Lerp(1f, 0f, _transitionDuration * 0.25f, expandedAlpha =>
+            AsyncTween.Float(1f, 0f, _transitionDuration * 0.25f, expandedAlpha =>
             {
                 _expandedCanvasGroup.alpha = expandedAlpha;
             });

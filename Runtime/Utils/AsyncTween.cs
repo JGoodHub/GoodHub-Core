@@ -17,15 +17,43 @@ namespace GoodHub.Core.Runtime.Utils
             Object.DontDestroyOnLoad(_routineRunner.gameObject);
         }
 
-        public static void Lerp(float from, float to, float duration, Action<float> stepCallback, Action completeCallback = null, Dictionary<float, Action> timeCallbacks = null, float delay = 0f)
+        public static Tweener Float(float from, float to, float duration, Action<float> stepCallback)
         {
-            _routineRunner.StartCoroutine(LerpRoutine(from, to, duration, stepCallback, completeCallback, timeCallbacks, delay));
+            Tweener tweener = new Tweener(stepCallback);
+
+            _routineRunner.StartCoroutine(LerpRoutine(from, to, duration, tweener, 0f));
+
+            return tweener;
         }
 
-        private static IEnumerator LerpRoutine(float from, float to, float duration, Action<float> stepCallback, Action completeCallback, Dictionary<float, Action> timeCallbacks, float delay)
+        public static Tweener DelayedFloat(float from, float to, float duration, Action<float> stepCallback, float delay)
+        {
+            Tweener tweener = new Tweener(stepCallback);
+
+            _routineRunner.StartCoroutine(LerpRoutine(from, to, duration, tweener, delay));
+
+            return tweener;
+        }
+
+        public static Tweener Vector2(Vector2 from, Vector2 to, float duration, Action<Vector2> stepCallback)
+        {
+            Tweener tweener = new Tweener(t =>
+            {
+                Vector2 lerpVector = UnityEngine.Vector2.Lerp(from, to, t);
+                stepCallback?.Invoke(lerpVector);
+            });
+
+            _routineRunner.StartCoroutine(LerpRoutine(0f, 1f, duration, tweener, 0f));
+
+            return tweener;
+        }
+
+        private static IEnumerator LerpRoutine(float from, float to, float duration, Tweener tweener, float delay)
         {
             if (delay > 0f)
                 yield return new WaitForSeconds(delay);
+
+            tweener.StartedCallback?.Invoke();
 
             float delta = to - from;
 
@@ -42,15 +70,15 @@ namespace GoodHub.Core.Runtime.Utils
 
                 try
                 {
-                    stepCallback?.Invoke(interpolate);
+                    tweener.SteppedCallback?.Invoke(interpolate);
 
-                    if (timeCallbacks != null)
+                    if (tweener.TriggerCallbacks.Count > 0)
                     {
-                        foreach (float boundary in timeCallbacks.Keys)
+                        foreach (float boundary in tweener.TriggerCallbacks.Keys)
                         {
                             if (lastFrameTime <= boundary && time >= boundary)
                             {
-                                timeCallbacks[boundary]?.Invoke();
+                                tweener.TriggerCallbacks[boundary]?.Invoke();
                             }
                         }
                     }
@@ -70,11 +98,11 @@ namespace GoodHub.Core.Runtime.Utils
 
             try
             {
-                stepCallback?.Invoke(to);
+                tweener.SteppedCallback?.Invoke(to);
 
-                completeCallback?.Invoke();
+                tweener.CompletedCallback?.Invoke();
 
-                if (timeCallbacks != null && timeCallbacks.TryGetValue(1f, out Action callback))
+                if (tweener.TriggerCallbacks.Count > 0 && tweener.TriggerCallbacks.TryGetValue(1f, out Action callback))
                     callback?.Invoke();
             }
             catch (Exception e)
@@ -83,6 +111,64 @@ namespace GoodHub.Core.Runtime.Utils
                 Debug.LogError(e);
                 throw;
             }
+        }
+    }
+
+    public class Tweener
+    {
+        private float _delay;
+
+        private Action _startedCallback;
+        private Action<float> _steppedCallback;
+        private Action _completedCallback;
+        private Dictionary<float, Action> _triggerCallbacks = new Dictionary<float, Action>();
+
+        public float Delay => _delay;
+
+        public Action StartedCallback => _startedCallback;
+
+        public Action<float> SteppedCallback => _steppedCallback;
+
+        public Action CompletedCallback => _completedCallback;
+
+        public Dictionary<float, Action> TriggerCallbacks => _triggerCallbacks;
+
+        public Tweener(Action<float> steppedCallback)
+        {
+            _steppedCallback = steppedCallback;
+        }
+
+        public Tweener SetDelay(float delay)
+        {
+            _delay = delay;
+            return this;
+        }
+
+        public Tweener OnStarted(Action callback)
+        {
+            _startedCallback = callback;
+            return this;
+        }
+
+        public Tweener OnCompleted(Action callback)
+        {
+            _completedCallback = callback;
+            return this;
+        }
+
+        public Tweener AddTrigger(float value, Action callback)
+        {
+            _triggerCallbacks[value] = callback;
+            return this;
+        }
+
+        public Tweener SetEasing()
+        {
+            return this;
+        }
+
+        public void Run()
+        {
         }
     }
 
