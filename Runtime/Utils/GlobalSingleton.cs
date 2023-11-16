@@ -10,5 +10,4 @@ namespace GoodHub.Core.Runtime
             DontDestroyOnLoad(this);
         }
     }
-
 }
