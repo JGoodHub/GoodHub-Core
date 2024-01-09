@@ -7,24 +7,30 @@ using UnityEngine.UI;
 
 namespace GoodHub.Core.Runtime.UI
 {
-
     public class ExpandablePanel : MonoBehaviour
     {
-        [SerializeField] private Button _expandButton;
-        [SerializeField] private Button _collapseButton;
-        [SerializeField] private Vector2 _collapsedSize;
-        [SerializeField] private Vector2 _expandedSize;
-        [SerializeField] private float _transitionDuration;
-        [SerializeField] private RectTransform _expandablePanel;
-        [SerializeField] private GameObject _collapsedContent;
-        [SerializeField] private GameObject _expandedContent;
-        [SerializeField] private CanvasGroup _collapsedCanvasGroup;
-        [SerializeField] private CanvasGroup _expandedCanvasGroup;
+        [Header("Expandable Panel Settings")]
+        [SerializeField] protected Button _expandButton;
+        [SerializeField] protected Button _collapseButton;
+        [SerializeField] protected Vector2 _collapsedSize;
+        [SerializeField] protected Vector2 _expandedSize;
+        [SerializeField] protected float _transitionDuration;
+        [SerializeField] protected RectTransform _expandablePanel;
+        [SerializeField] protected GameObject _collapsedContent;
+        [SerializeField] protected GameObject _expandedContent;
+        [SerializeField] protected CanvasGroup _collapsedCanvasGroup;
+        [SerializeField] protected CanvasGroup _expandedCanvasGroup;
 
         private bool _isExpanded;
         private bool _isTweening;
 
-        protected virtual void Start()
+        public event Action OnExpandStarted;
+        public event Action OnExpandFinished;
+
+        public event Action OnCollapseStarted;
+        public event Action OnCollapseFinished;
+
+        protected virtual void Awake()
         {
             _expandButton.onClick.AddListener(Expand);
             _collapseButton.onClick.AddListener(Collapse);
@@ -32,12 +38,15 @@ namespace GoodHub.Core.Runtime.UI
             SetToCollapsedState(true);
         }
 
-        private void Expand()
+        protected void Expand()
         {
             if (_isTweening || _isExpanded)
                 return;
 
+            OnExpandStarted?.Invoke();
+
             _isTweening = true;
+            float transitionDurationQuarter = _transitionDuration * 0.25f;
 
             _expandedContent.SetActive(true);
             _collapsedContent.SetActive(true);
@@ -57,26 +66,30 @@ namespace GoodHub.Core.Runtime.UI
                     _isTweening = false;
 
                     _collapsedContent.SetActive(false);
+
+                    OnExpandFinished?.Invoke();
                 })
-                .AddTrigger(_transitionDuration * 0.75f, () =>
+                .AddTrigger(_transitionDuration - transitionDurationQuarter, () =>
                 {
-                    AsyncTween.Float(0f, 1f, _transitionDuration * 0.25f, expandedAlpha =>
+                    AsyncTween.Float(0f, 1f, transitionDurationQuarter, expandedAlpha =>
                     {
                         _expandedCanvasGroup.alpha = expandedAlpha;
                     });
                 })
                 .SetEasing(Easing.OutQuart);
 
-            AsyncTween.Float(1f, 0f, _transitionDuration * 0.25f, collapsedAlpha =>
+            AsyncTween.Float(1f, 0f, transitionDurationQuarter, collapsedAlpha =>
             {
                 _collapsedCanvasGroup.alpha = collapsedAlpha;
             });
         }
 
-        private void Collapse()
+        protected void Collapse()
         {
             if (_isTweening || _isExpanded == false)
                 return;
+
+            OnCollapseStarted?.Invoke();
 
             _isTweening = true;
             float transitionDurationQuarter = _transitionDuration * 0.25f;
@@ -99,6 +112,8 @@ namespace GoodHub.Core.Runtime.UI
                     _isTweening = false;
 
                     _expandedContent.SetActive(false);
+
+                    OnCollapseFinished?.Invoke();
                 })
                 .AddTrigger(_transitionDuration - transitionDurationQuarter, () =>
                 {
@@ -139,5 +154,4 @@ namespace GoodHub.Core.Runtime.UI
         [ContextMenu("Set To Collapsed State")]
         private void SetToCollapsedStateMenuItem() => SetToCollapsedState(true);
     }
-
 }

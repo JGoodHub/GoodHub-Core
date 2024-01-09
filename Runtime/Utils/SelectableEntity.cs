@@ -11,7 +11,7 @@ namespace GoodHub.Core.Runtime
     {
         [Header("Entity")]
         public new string name;
-        public int id;
+        public int guid;
 
         [Space]
         [SerializeField] private GameObject selectionRing;
@@ -24,7 +24,7 @@ namespace GoodHub.Core.Runtime
             SelectionController.Singleton.RegisterEntity(this);
             SetSelected(false);
 
-            id = Random.Range(0, 1000000);
+            guid = Random.Range(0, 1000000);
         }
 
         private void OnDestroy()

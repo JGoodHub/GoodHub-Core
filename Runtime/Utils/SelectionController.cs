@@ -18,7 +18,7 @@ namespace GoodHub.Core.Runtime
         public SelectableEntity SelectedEntity => _selectedEntity;
         
 
-        public delegate void SelectionChange(object sender, SelectableEntity oldEntity, SelectableEntity newEntity);
+        public delegate void SelectionChange(SelectionController sender, SelectableEntity oldEntity, SelectableEntity newEntity);
 
         public event SelectionChange OnSelectionChanged;
 
