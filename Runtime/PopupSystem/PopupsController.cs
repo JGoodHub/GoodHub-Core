@@ -44,6 +44,11 @@ namespace GoodHub.Core.Runtime.PopupSystem
         {
             _popupQueue = new PriorityQueue<PopupBase>();
             _popupPrefabsCache = new Dictionary<string, GameObject>();
+            
+            if (string.IsNullOrWhiteSpace(_popupResourcesFolder) == false && _popupResourcesFolder.EndsWith("/") == false)
+            {
+                _popupResourcesFolder += "/";
+            }
         }
 
         /// <summary>
