@@ -42,6 +42,8 @@ namespace GoodHub.Core.Runtime.PopupSystem
 
         protected override void Awake()
         {
+            base.Awake();
+            
             _popupQueue = new PriorityQueue<PopupBase>();
             _popupPrefabsCache = new Dictionary<string, GameObject>();
             
@@ -83,7 +85,7 @@ namespace GoodHub.Core.Runtime.PopupSystem
 
             if (_activePopup == null && _popupQueue.Count == 0)
             {
-                if (_activePopup.CanBeShown() == false)
+                if (popupScript.CanBeShown() == false)
                 {
                     Destroy(_activePopup.gameObject);
                     _activePopup = null;
@@ -94,6 +96,7 @@ namespace GoodHub.Core.Runtime.PopupSystem
 
                 _activePopup = popupScript;
                 _activePopup.PopupActivated();
+                
                 OnPopupActivated?.Invoke(_activePopup);
 
                 return popupScript;
@@ -133,7 +136,10 @@ namespace GoodHub.Core.Runtime.PopupSystem
             _activePopup = null;
 
             if (_popupQueue.Count == 0)
+            {
+                _dismissalRoutine = null;
                 yield break;
+            }
 
             // Activate the next popup in the queue
 
