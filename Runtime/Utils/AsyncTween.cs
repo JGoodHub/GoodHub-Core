@@ -9,11 +9,11 @@ namespace GoodHub.Core.Runtime.Utils
 
     public static class AsyncTween
     {
-        private static AsyncRoutineRunner _routineRunner;
+        private static CoroutineRoutineRunner _routineRunner;
 
         static AsyncTween()
         {
-            _routineRunner = new GameObject("[AsyncTween_RoutineRunner]").AddComponent<AsyncRoutineRunner>();
+            _routineRunner = new GameObject("[AsyncTween_RoutineRunner]").AddComponent<CoroutineRoutineRunner>();
             Object.DontDestroyOnLoad(_routineRunner.gameObject);
         }
 
