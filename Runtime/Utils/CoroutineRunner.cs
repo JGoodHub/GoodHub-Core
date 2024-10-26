@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace GoodHub.Core.Runtime.Utils
 {
-    public class CoroutineRoutineRunner : GlobalSingleton<CoroutineRoutineRunner>
+    public class CoroutineRunner : GlobalSingleton<CoroutineRunner>
     {
         /// <summary>
         /// Starts a coroutine.
