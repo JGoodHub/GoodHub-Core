@@ -6,7 +6,7 @@ using UnityEngine;
 /// <summary>
 /// Represents a polygon or polyline constructed from control points on the X-Z plane.
 /// </summary>
-public class Polygon
+public class CurvedPath
 {
     private struct Curve
     {
@@ -91,7 +91,7 @@ public class Polygon
 
     private float[] controlDistancesCache;
 
-    public Polygon(Vector3[] controlPositions, bool looped, float bezierHandleLength = 0.25f, int bezierResolution = 6)
+    public CurvedPath(Vector3[] controlPositions, bool looped, float bezierHandleLength = 0.25f, int bezierResolution = 6)
     {
         this.looped = looped;
 

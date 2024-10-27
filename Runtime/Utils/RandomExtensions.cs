@@ -15,5 +15,22 @@ namespace GoodHub.Core.Runtime.Utils
             return min + ((float)random.NextDouble() * (max - min));
         }
 
+        public static void NextSwapIndices(this Random random, int count, out int indexA, out int indexB)
+        {
+            if (count <= 1)
+            {
+                indexA = 0;
+                indexB = 0;
+                return;
+            }
+
+            do
+            {
+                indexA = random.Next(count);
+                indexB = random.Next(count);
+            }
+            while (indexA == indexB);
+        }
+
     }
 }

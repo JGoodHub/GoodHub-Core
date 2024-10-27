@@ -3,22 +3,35 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MellowMadness.Core
+namespace Goodhub.Core
 {
-    public class RuntimeCombiner : MonoBehaviour
+    public class RuntimeMeshCombiner : MonoBehaviour
     {
-        public bool combineOnStart = true;
+        public bool CombineOnStart;
+        [Space]
+        public bool UseInt32Buffers;
+        public bool DestroyChildMeshes;
+        public bool DestroyAllChildren;
 
-        //flags
-        public bool useInt32Buffers;
-        public bool destroyChildMeshes;
-        public bool destroyAllChildren;
-
-        // Start is called before the first frame update
-        void Start()
+        private void Start()
         {
-            if (combineOnStart)
+            if (CombineOnStart)
+            {
                 Combine();
+            }
+        }
+
+        public void Combine(float delay)
+        {
+            StopAllCoroutines();
+            StartCoroutine(CombineWithDelayRoutine(delay));
+        }
+
+        private IEnumerator CombineWithDelayRoutine(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+
+            Combine();
         }
 
         public void Combine()
@@ -41,8 +54,8 @@ namespace MellowMadness.Core
 
                     subMesh.vertices = baseMesh.vertices.Clone() as Vector3[];
                     subMesh.normals = baseMesh.normals.Clone() as Vector3[];
-                    subMesh.uv = baseMesh.normals.Clone() as Vector2[];
-                    subMesh.uv2 = baseMesh.normals.Clone() as Vector2[];
+                    subMesh.uv = baseMesh.uv.Clone() as Vector2[];
+                    subMesh.uv2 = baseMesh.uv2.Clone() as Vector2[];
 
                     subMesh.triangles = baseMesh.GetTriangles(s);
 
@@ -66,6 +79,7 @@ namespace MellowMadness.Core
             {
                 Mesh matMesh = new Mesh();
 
+                matMesh.indexFormat = UseInt32Buffers ? UnityEngine.Rendering.IndexFormat.UInt32 : UnityEngine.Rendering.IndexFormat.UInt16;
                 matMesh.CombineMeshes(subMeshesByMaterial[mat].ToArray(), true, true);
 
                 CombineInstance combineInstance = new CombineInstance();
@@ -76,10 +90,12 @@ namespace MellowMadness.Core
             }
 
             if (gameObject.TryGetComponent(out MeshFilter targetMeshFilter) == false)
+            {
                 targetMeshFilter = gameObject.AddComponent<MeshFilter>();
+            }
 
             targetMeshFilter.mesh = new Mesh();
-            targetMeshFilter.mesh.indexFormat = useInt32Buffers ? UnityEngine.Rendering.IndexFormat.UInt32 : UnityEngine.Rendering.IndexFormat.UInt16;
+            targetMeshFilter.mesh.indexFormat = UseInt32Buffers ? UnityEngine.Rendering.IndexFormat.UInt32 : UnityEngine.Rendering.IndexFormat.UInt16;
             targetMeshFilter.mesh.CombineMeshes(new List<CombineInstance>(meshesByMaterial.Values).ToArray(), false, false);
 
             targetMeshFilter.mesh.Optimize();
@@ -88,22 +104,28 @@ namespace MellowMadness.Core
             targetMeshFilter.mesh.RecalculateTangents();
 
             if (gameObject.TryGetComponent(out MeshRenderer targetMeshRen) == false)
+            {
                 targetMeshRen = gameObject.AddComponent<MeshRenderer>();
+            }
 
             targetMeshRen.sharedMaterials = new List<Material>(meshesByMaterial.Keys).ToArray();
 
-            if (destroyChildMeshes)
+            if (DestroyChildMeshes)
             {
                 for (int i = 1; i < filters.Length; i++)
+                {
                     Destroy(filters[i].gameObject);
+                }
             }
 
-            if (destroyAllChildren)
+            if (DestroyAllChildren)
             {
                 Transform[] childTransforms = gameObject.GetComponentsInChildren<Transform>();
 
                 for (int i = 1; i < childTransforms.Length; i++)
+                {
                     Destroy(childTransforms[i].gameObject);
+                }
             }
 
             gameObject.transform.position = worldPosition;
