@@ -1,24 +1,26 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace GoodHub.Core.Runtime.Curves
 {
-    public struct BezierCurve3
+    public struct BezierCurve3 : ICurve
     {
         private Vector3[] _controls;
         private Vector3 _up;
 
         public BezierCurve3(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 up)
         {
-            _controls = new Vector3[3] {p0, p1, p2};
+            _controls = new[] { p0, p1, p2 };
             _up = up;
         }
 
-        public void SetControls(Vector3 p0, Vector3 p1, Vector3 p2)
+        public BezierCurve3(List<Vector3> points, Vector3 up) : this()
         {
-            _controls = new Vector3[3] {p0, p1, p2};
+            _controls = points.GetRange(0, 3).ToArray();
+            _up = up;
         }
 
-        public Vector3 SamplePosition(float t)
+        public Vector3 SamplePositionInterpolate(float t)
         {
             t = Mathf.Clamp01(t);
 
@@ -28,20 +30,20 @@ namespace GoodHub.Core.Runtime.Curves
             return Vector3.Lerp(p0p1, p1p2, t);
         }
 
-        public Vector3 SampleNormal(float t)
+        public Vector3 SampleNormalInterpolate(float t)
         {
-            Vector3 pointA = SamplePosition(Mathf.Clamp01(t - 0.01f));
-            Vector3 pointB = SamplePosition(Mathf.Clamp01(t + 0.01f));
+            Vector3 pointA = SamplePositionInterpolate(Mathf.Clamp01(t - 0.01f));
+            Vector3 pointB = SamplePositionInterpolate(Mathf.Clamp01(t + 0.01f));
 
             Vector3 tangent = (pointB - pointA).normalized;
 
             return Vector3.Cross(tangent, _up).normalized;
         }
 
-        public Vector3 SampleTangent(float t)
+        public Vector3 SampleTangentInterpolate(float t)
         {
-            Vector3 pointA = SamplePosition(Mathf.Clamp01(t - 0.01f));
-            Vector3 pointB = SamplePosition(Mathf.Clamp01(t + 0.01f));
+            Vector3 pointA = SamplePositionInterpolate(Mathf.Clamp01(t - 0.01f));
+            Vector3 pointB = SamplePositionInterpolate(Mathf.Clamp01(t + 0.01f));
 
             return (pointB - pointA).normalized;
         }
@@ -55,7 +57,7 @@ namespace GoodHub.Core.Runtime.Curves
 
             for (float t = 0f; t <= 1f - Mathf.Epsilon; t += step)
             {
-                points[i] = SamplePosition(t);
+                points[i] = SamplePositionInterpolate(t);
                 i++;
             }
 
@@ -66,40 +68,42 @@ namespace GoodHub.Core.Runtime.Curves
         {
             float length = 0f;
 
-            Vector3 lastPos = SamplePosition(0f);
+            Vector3 lastPos = SamplePositionInterpolate(0f);
 
             const float step = 1f / 64f;
             for (float i = step; i <= 1f; i += step)
             {
-                Vector3 currPos = SamplePosition(i);
+                Vector3 currPos = SamplePositionInterpolate(i);
                 length += (currPos - lastPos).magnitude;
 
                 lastPos = currPos;
 
                 if (i + step > 1f)
                 {
-                    length += (SamplePosition(1f) - lastPos).magnitude;
+                    length += (SamplePositionInterpolate(1f) - lastPos).magnitude;
                 }
             }
 
             return length;
         }
 
-        public void DrawDebug(int res, float y, bool drawControls, bool drawCurve)
+        public void DrawDebug(int res, bool drawControls, bool drawCurve)
         {
-            float step = 1f / res;
-            Vector3 offsetVector = new Vector3(0f, y, 0f);
-
             if (drawControls)
             {
                 for (int i = 0; i < _controls.Length - 1; i++)
-                    Debug.DrawLine(_controls[i] + offsetVector, _controls[i + 1] + offsetVector, Color.yellow);
+                {
+                    Debug.DrawLine(_controls[i], _controls[i + 1], Color.yellow);
+                }
             }
 
             if (drawCurve)
             {
+                float step = 1f / res;
                 for (float t = 0f; t < 1f; t += step)
-                    Debug.DrawLine(SamplePosition(t) + offsetVector, SamplePosition(t + step) + offsetVector, Color.magenta);
+                {
+                    Debug.DrawLine(SamplePositionInterpolate(t), SamplePositionInterpolate(t + step), Color.magenta);
+                }
             }
         }
     }

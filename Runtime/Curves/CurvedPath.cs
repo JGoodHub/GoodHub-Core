@@ -64,7 +64,7 @@ namespace GoodHub.Core.Runtime.Curves
             controlDistancesCache[controlPositions.Length - 1] = distanceSum;
         }
 
-    #region Public Methods
+        #region Public Methods
 
         /// <summary>
         /// Take in a set of points making up a 2D polygon on the X and Z axis and from them creates a grid bounds that matches the inputs shape
@@ -421,12 +421,12 @@ namespace GoodHub.Core.Runtime.Curves
             {
                 float pointDist = Vector3.Distance(ControlPositions[p], ControlPositions[p + 1]);
 
-                BezierCurve4 bezierCurve4 = new BezierCurve4();
-                bezierCurve4.SetControls(
+                BezierCurve4 bezierCurve4 = new BezierCurve4(
                     ControlPositions[p],
                     ControlPositions[p] + (ControlTangents[p] * (pointDist * handleLength)),
                     ControlPositions[p + 1] - (ControlTangents[p + 1] * (pointDist * handleLength)),
-                    ControlPositions[p + 1]
+                    ControlPositions[p + 1],
+                    Vector3.up
                 );
 
                 curveSegments.Add(bezierCurve4);
@@ -434,13 +434,13 @@ namespace GoodHub.Core.Runtime.Curves
 
             for (int i = 0; i < curveSegments.Count; i++)
             {
-                curveSegments[i].DrawDebug(resolution, 0, false, true);
+                curveSegments[i].DrawDebug(resolution, false, true);
             }
 
             List<Vector3> samplePoints = new List<Vector3>();
             for (int i = 0; i < curveSegments.Count; i++)
             {
-                samplePoints.AddRange(curveSegments[i].SampleCurve(resolution));
+                samplePoints.AddRange(curveSegments[i].BatchSamplePosition(resolution));
             }
 
             for (int i = 0; i < samplePoints.Count - 1; i++)
@@ -478,9 +478,9 @@ namespace GoodHub.Core.Runtime.Curves
                 Debug.DrawRay(ControlPositions[t] + offset, ControlTangents[t] * rayLength, Color.blue, duration);
         }
 
-    #endregion
+        #endregion
 
-    #region Utility Functions
+        #region Utility Functions
 
         /// <summary>
         /// Checks if two lines intersect on the X-Z plane
@@ -686,6 +686,6 @@ namespace GoodHub.Core.Runtime.Curves
             return sqrd ? direction.sqrMagnitude : direction.magnitude;
         }
 
-    #endregion
+        #endregion
     }
 }

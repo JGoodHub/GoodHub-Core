@@ -6,17 +6,13 @@ using UnityEngine.EventSystems;
 
 namespace GoodHub.Core.Runtime
 {
-
     public class SelectionController : SceneSingleton<SelectionController>
     {
-
         private HashSet<SelectableEntity> _allEntities = new HashSet<SelectableEntity>();
 
         private SelectableEntity _selectedEntity;
-        
-        
+
         public SelectableEntity SelectedEntity => _selectedEntity;
-        
 
         public delegate void SelectionChange(SelectionController sender, SelectableEntity oldEntity, SelectableEntity newEntity);
 
@@ -34,8 +30,7 @@ namespace GoodHub.Core.Runtime
 
         public void RegisterEntity(SelectableEntity entity)
         {
-            if (_allEntities.Contains(entity) == false)
-                _allEntities.Add(entity);
+            _allEntities.Add(entity);
         }
 
         public void UnregisterEntity(SelectableEntity entity)
@@ -69,7 +64,7 @@ namespace GoodHub.Core.Runtime
             {
                 _selectedEntity = newSelection;
 
-                _selectedEntity.SetSelected(true);
+                _selectedEntity.SelectionStatusChanged(true);
 
                 OnSelectionChanged?.Invoke(this, null, newSelection);
                 return;
@@ -81,8 +76,8 @@ namespace GoodHub.Core.Runtime
                 SelectableEntity oldSelection = _selectedEntity;
                 _selectedEntity = newSelection;
 
-                oldSelection.SetSelected(false);
-                newSelection.SetSelected(true);
+                oldSelection.SelectionStatusChanged(false);
+                newSelection.SelectionStatusChanged(true);
 
                 OnSelectionChanged?.Invoke(this, oldSelection, newSelection);
                 return;
@@ -94,7 +89,7 @@ namespace GoodHub.Core.Runtime
                 SelectableEntity oldSelection = _selectedEntity;
                 _selectedEntity = null;
 
-                oldSelection.SetSelected(false);
+                oldSelection.SelectionStatusChanged(false);
 
                 OnSelectionChanged?.Invoke(this, oldSelection, null);
 
@@ -110,7 +105,7 @@ namespace GoodHub.Core.Runtime
             SelectableEntity oldSelectedEntity = _selectedEntity;
             _selectedEntity = null;
 
-            oldSelectedEntity.SetSelected(false);
+            oldSelectedEntity.SelectionStatusChanged(false);
 
             OnSelectionChanged?.Invoke(this, oldSelectedEntity, null);
         }
@@ -142,7 +137,5 @@ namespace GoodHub.Core.Runtime
 
             return nearbyEntities;
         }
-
     }
-
 }

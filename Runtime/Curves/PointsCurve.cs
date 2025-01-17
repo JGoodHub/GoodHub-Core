@@ -74,22 +74,58 @@ namespace GoodHub.Core.Runtime.Curves
             return _length;
         }
 
-        // public void DrawDebug(int res, float y, bool drawControls, bool drawCurve)
-        // {
-        //     float step = 1f / res;
-        //     Vector3 offsetVector = new Vector3(0f, y, 0f);
-        //
-        //     if (drawControls)
-        //     {
-        //         for (int i = 0; i < _controls.Length - 1; i++)
-        //             Debug.DrawLine(_controls[i] + offsetVector, _controls[i + 1] + offsetVector, Color.yellow);
-        //     }
-        //
-        //     if (drawCurve)
-        //     {
-        //         for (float t = 0f; t < 1f; t += step)
-        //             Debug.DrawLine(SamplePosition(t) + offsetVector, SamplePosition(t + step) + offsetVector, Color.magenta);
-        //     }
-        // }
+        public void DrawDebug(float y, bool drawControls, bool drawCurve)
+        {
+            Vector3 offsetVector = new Vector3(0f, y, 0f);
+
+            if (drawControls || drawCurve)
+            {
+                for (int i = 0; i < _points.Length - 1; i++)
+                {
+                    Debug.DrawLine(_points[i] + offsetVector, _points[i + 1] + offsetVector, Color.yellow, 30f);
+                    Debug.DrawRay(_points[i] + offsetVector, Vector3.up * 0.05f, Color.yellow, 30f);
+                }
+            }
+        }
+
+        public float GetDistanceAlongCurve(Vector3 position)
+        {
+            int bestEdgeIndex = -1;
+            float bestEdgeDist = float.MaxValue;
+
+            for (int i = 0; i < _points.Length - 1; i++)
+            {
+                Vector3 edgeMidPoint = (_points[i] + _points[i + 1]) / 2f;
+                float edgeDist = (position - edgeMidPoint).magnitude;
+
+                if (edgeDist < bestEdgeDist)
+                {
+                    bestEdgeDist = edgeDist;
+                    bestEdgeIndex = i;
+                }
+            }
+            
+            // Get the distance to the first edge index
+            float distanceToBestEdgeStart = 0f;
+            for (int i = 1; i <= bestEdgeIndex; i++)
+            {
+                distanceToBestEdgeStart += (_points[i] - _points[i - 1]).magnitude;
+            }
+
+            Vector3 AB = _points[bestEdgeIndex + 1] - _points[bestEdgeIndex]; // Direction vector from A to B
+            Vector3 AP = position - _points[bestEdgeIndex]; // Vector from A to P
+            float AB_dot_AB = Vector3.Dot(AB, AB); // Squared length of the line segment
+            float AB_dot_AP = Vector3.Dot(AB, AP); // Projection factor (dot product of AB and AP)
+
+            // Projection factor t
+            float t = AB_dot_AP / AB_dot_AB;
+
+            // If clamping to the line segment, clamp t between 0 and 1
+            t = Mathf.Clamp01(t);
+            Vector3 closestPoint = _points[bestEdgeIndex] + t * AB;
+            
+            // Calculate the closest point using the projection factor
+            return distanceToBestEdgeStart + Vector3.Distance(_points[bestEdgeIndex], closestPoint);
+        }
     }
 }

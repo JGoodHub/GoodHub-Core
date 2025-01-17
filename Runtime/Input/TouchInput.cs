@@ -15,7 +15,7 @@ namespace GoodHub.Core.Runtime
             public Vector2 UpPosition;
 
             public bool IsDragging;
-            public float TotalDragDistance;
+            public float CurrentDragDistance;
             //public float FrameDragDistance;
 
             public bool DownOverUI;
@@ -24,7 +24,7 @@ namespace GoodHub.Core.Runtime
         }
 
         #region Events
-        
+
         public delegate void TouchDelegate(TouchData touchData);
 
         public static event TouchDelegate OnTouchDown;
@@ -38,7 +38,7 @@ namespace GoodHub.Core.Runtime
         public static event TouchDelegate OnTouchDragStay;
 
         public static event TouchDelegate OnTouchDragExit;
-        
+
         #endregion
 
         public float _relativeDistanceToDrag = 0.04f;
@@ -63,15 +63,17 @@ namespace GoodHub.Core.Runtime
             if (Input.GetMouseButtonDown(0))
             {
                 TriggerTouchDown();
+                _frameTouchData.CurrentDragDistance = 0;
             }
 
             if (Input.GetMouseButton(0))
             {
-                _frameTouchData.TotalDragDistance = Vector2.Distance(_frameTouchData.DownPosition, _frameTouchData.CurrentPosition);
+                _frameTouchData.CurrentDragDistance = Vector2.Distance(_frameTouchData.DownPosition, _frameTouchData.CurrentPosition);
+                Debug.Log(_frameTouchData.CurrentDragDistance);
 
-                if (_frameTouchData.IsDragging || _frameTouchData.TotalDragDistance >= _pixelDistanceToDrag)
+                if (_frameTouchData.IsDragging || _frameTouchData.CurrentDragDistance >= _pixelDistanceToDrag)
                 {
-                    if (!_frameTouchData.IsDragging)
+                    if (_frameTouchData.IsDragging == false)
                     {
                         TriggerTouchDragEnter();
                     }
@@ -85,15 +87,13 @@ namespace GoodHub.Core.Runtime
                 {
                     TriggerTouchDragExit();
                 }
-
-                _frameTouchData.TotalDragDistance = 0;
             }
 
             if (Input.GetMouseButtonUp(0))
             {
                 TriggerTouchUp();
 
-                if (_frameTouchData.TotalDragDistance < _pixelDistanceToDrag)
+                if (_frameTouchData.CurrentDragDistance < _pixelDistanceToDrag)
                 {
                     TriggerTouchClick();
                 }
