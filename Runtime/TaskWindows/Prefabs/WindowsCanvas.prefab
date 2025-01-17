@@ -113,7 +113,7 @@ MonoBehaviour:
   _explorerButton: {fileID: 6593652642592309676}
   _explorer: {fileID: 1547553692988992272}
   _activeTaskIconsRoot: {fileID: 716061647646355875}
-  _activeTaskWindowsRoot: {fileID: 7693758800636928535}
+  _activeTaskWindowsRoot: {fileID: 1053551887574885282}
 --- !u!1 &5573111267640248268
 GameObject:
   m_ObjectHideFlags: 0
@@ -451,6 +451,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8061302893119087855}
     m_Modifications:
+    - target: {fileID: 1391686517575108663, guid: 15bf41b2c74c741399e7e65ab835cf60, type: 3}
+      propertyPath: m_Size
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1823428245843924825, guid: 15bf41b2c74c741399e7e65ab835cf60, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
@@ -474,6 +478,10 @@ PrefabInstance:
     - target: {fileID: 5532873032811979838, guid: 15bf41b2c74c741399e7e65ab835cf60, type: 3}
       propertyPath: m_SizeDelta.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5532873032811979838, guid: 15bf41b2c74c741399e7e65ab835cf60, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0.000008106232
       objectReference: {fileID: 0}
     - target: {fileID: 7226047686954497824, guid: 15bf41b2c74c741399e7e65ab835cf60, type: 3}
       propertyPath: m_Name

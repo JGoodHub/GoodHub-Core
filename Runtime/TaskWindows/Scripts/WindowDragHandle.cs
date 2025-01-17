@@ -13,17 +13,13 @@ namespace GoodHub.Core.Runtime
         public void OnBeginDrag(PointerEventData eventData)
         {
             _beginDragPointerPosition = eventData.position;
-            _beginDragWindowPosition = ((RectTransform)_targetWindow.transform).anchoredPosition;
-
-            Debug.LogError($"{_beginDragPointerPosition}");
+            _beginDragWindowPosition = ((RectTransform) _targetWindow.transform).anchoredPosition;
         }
 
         public void OnDrag(PointerEventData eventData)
         {
             Vector2 dragDelta = eventData.position - _beginDragPointerPosition;
-            ((RectTransform)_targetWindow.transform).anchoredPosition = _beginDragWindowPosition + dragDelta;
-
-            Debug.LogError($"{dragDelta}");
+            ((RectTransform) _targetWindow.transform).anchoredPosition = _beginDragWindowPosition + dragDelta;
         }
     }
 }

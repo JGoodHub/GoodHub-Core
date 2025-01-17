@@ -17,10 +17,12 @@ namespace GoodHub.Core.Runtime
             _openTaskWindowButton.onClick.AddListener(OpenTaskWindow);
         }
 
-        public void Initialise(WindowsManager windowsManager,WindowConfiguration windowConfig)
+        public void Initialise(WindowsManager windowsManager, WindowConfiguration windowConfig)
         {
             _windowsManager = windowsManager;
             _windowConfig = windowConfig;
+
+            _taskName.text = windowConfig.Name;
         }
 
         private void OpenTaskWindow()
