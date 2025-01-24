@@ -74,17 +74,14 @@ namespace GoodHub.Core.Runtime.Curves
             return _length;
         }
 
-        public void DrawDebug(float y, bool drawControls, bool drawCurve)
+        public void DrawDebug(float y)
         {
             Vector3 offsetVector = new Vector3(0f, y, 0f);
 
-            if (drawControls || drawCurve)
+            for (int i = 0; i < _points.Length - 1; i++)
             {
-                for (int i = 0; i < _points.Length - 1; i++)
-                {
-                    Debug.DrawLine(_points[i] + offsetVector, _points[i + 1] + offsetVector, Color.yellow, 30f);
-                    Debug.DrawRay(_points[i] + offsetVector, Vector3.up * 0.05f, Color.yellow, 30f);
-                }
+                Debug.DrawLine(_points[i] + offsetVector, _points[i + 1] + offsetVector, Color.yellow, 30f);
+                Debug.DrawRay(_points[i] + offsetVector, Vector3.up * 0.05f, Color.yellow, 30f);
             }
         }
 
@@ -104,7 +101,7 @@ namespace GoodHub.Core.Runtime.Curves
                     bestEdgeIndex = i;
                 }
             }
-            
+
             // Get the distance to the first edge index
             float distanceToBestEdgeStart = 0f;
             for (int i = 1; i <= bestEdgeIndex; i++)
@@ -123,7 +120,7 @@ namespace GoodHub.Core.Runtime.Curves
             // If clamping to the line segment, clamp t between 0 and 1
             t = Mathf.Clamp01(t);
             Vector3 closestPoint = _points[bestEdgeIndex] + t * AB;
-            
+
             // Calculate the closest point using the projection factor
             return distanceToBestEdgeStart + Vector3.Distance(_points[bestEdgeIndex], closestPoint);
         }

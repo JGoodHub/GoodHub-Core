@@ -317,6 +317,9 @@ namespace GoodHub.Core.Runtime.Curves
                     distToBSqrd = distToISqrd;
                 }
             }
+            
+            Debug.DrawLine(queryPos, ControlPositions[nearestPointA]);
+            Debug.DrawLine(queryPos, ControlPositions[nearestPointB]);
 
             //Make sure position A is before position B
             if (nearestPointA > nearestPointB)
