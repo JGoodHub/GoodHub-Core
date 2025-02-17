@@ -34,12 +34,16 @@ namespace GoodHub.Core.Runtime
             }
         }
 
-        public virtual void Initialise(WindowsManager windowsManager, WindowConfiguration windowConfig, WindowIcon windowIcon)
+        public void Initialise(WindowsManager windowsManager, WindowConfiguration windowConfig, WindowIcon windowIcon)
         {
             _windowsManager = windowsManager;
             _windowConfig = windowConfig;
             _windowIcon = windowIcon;
+            
+            OnInitialised();
         }
+
+        protected virtual void OnInitialised() { }
 
         public void MinimiseWindow()
         {
