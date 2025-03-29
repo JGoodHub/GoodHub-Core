@@ -17,6 +17,8 @@ namespace GoodHub.Core.Runtime
         [SerializeField] private float _selectionRadius;
         [SerializeField] private int _selectionPriority; // Higher == More Important
 
+        public int GUID => _guid;
+
         public float SelectionRadius => _selectionRadius;
 
         public GameObject SelectionRing => _selectionRing;
