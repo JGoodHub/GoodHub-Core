@@ -1,10 +1,9 @@
 {
-	"name": "goodhub.core",
-	"version": "1.0.0",
-	"displayName": "GoodHub Core",
-	"description": "",
-	"dependencies": 
-	{
-		"com.unity.nuget.newtonsoft-json": "3.2.1"
-	}
+  "name": "goodhub.core",
+  "version": "1.0.0",
+  "displayName": "GoodHub Core",
+  "description": "",
+  "dependencies": {
+    "com.unity.nuget.newtonsoft-json": "3.2.1"
+  }
 }

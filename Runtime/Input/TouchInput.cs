@@ -69,7 +69,7 @@ namespace GoodHub.Core.Runtime
             if (Input.GetMouseButton(0))
             {
                 _frameTouchData.CurrentDragDistance = Vector2.Distance(_frameTouchData.DownPosition, _frameTouchData.CurrentPosition);
-                Debug.Log(_frameTouchData.CurrentDragDistance);
+                //Debug.Log(_frameTouchData.CurrentDragDistance);
 
                 if (_frameTouchData.IsDragging || _frameTouchData.CurrentDragDistance >= _pixelDistanceToDrag)
                 {
