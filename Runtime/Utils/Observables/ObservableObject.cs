@@ -6,25 +6,24 @@ namespace GoodHub.Core.Runtime.Observables
 {
     [Serializable]
     [NotNull]
-    public class ObservableEnum<TEnum> : Observable<TEnum>, IObservable
-        where TEnum : Enum
+    public class ObservableObject<TObject> : Observable<TObject>, IObservable
+        where TObject : class
     {
-        public ObservableEnum(TEnum initialValue, bool invokeChangedAction = true)
+        public ObservableObject(TObject initialValue, bool invokeChangedAction = true)
             : base(initialValue, invokeChangedAction) { }
 
-        public int IntValue => Convert.ToInt32(Value);
-
-        public string StringValue => Value.ToString();
+        public string StringValue =>
+            $"{(Value == null ? "null" : Value.ToString())} ({typeof(TObject).Name})";
 
         // Implicit conversion
-        public static implicit operator TEnum(ObservableEnum<TEnum> o)
+        public static implicit operator TObject(ObservableObject<TObject> o)
         {
             if (o == null)
             {
                 Debug.LogError(
                     "Observable is null, cannot complete implicit conversion. Returning default value."
                 );
-                return default;
+                return null;
             }
 
             return o.Value;
@@ -33,7 +32,7 @@ namespace GoodHub.Core.Runtime.Observables
         //Override Equals and GetHashCode
         public override bool Equals(object obj)
         {
-            return obj is ObservableEnum<TEnum> other && Equals(Value, other.Value);
+            return obj is ObservableObject<TObject> other && Equals(Value, other.Value);
         }
 
         public override int GetHashCode()

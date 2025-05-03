@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using GoodHub.Core.Runtime.Observables;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace GoodHub.Core.Runtime
 {
@@ -12,11 +10,26 @@ namespace GoodHub.Core.Runtime
 
         private SelectableEntity _selectedEntity;
 
-        public SelectableEntity SelectedEntity => _selectedEntity;
+        public SelectableEntity SelectedEntity
+        {
+            get => _selectedEntity;
+            private set
+            {
+                _selectedEntity = value;
+                ObservableSelectedEntity.Value = _selectedEntity;
+            }
+        }
 
-        public delegate void SelectionChange(SelectionController sender, SelectableEntity oldEntity, SelectableEntity newEntity);
+        public delegate void SelectionChange(
+            SelectionController sender,
+            SelectableEntity oldEntity,
+            SelectableEntity newEntity
+        );
 
         public event SelectionChange OnSelectionChanged;
+
+        public ObservableObject<SelectableEntity> ObservableSelectedEntity =
+            new ObservableObject<SelectableEntity>(null);
 
         private void Start()
         {
@@ -56,25 +69,25 @@ namespace GoodHub.Core.Runtime
         public void SetSelection(SelectableEntity newSelection)
         {
             // Empty to empty so no change
-            if (_selectedEntity == null && newSelection == null)
+            if (SelectedEntity == null && newSelection == null)
                 return;
 
             // Selecting an entity from empty
-            if (_selectedEntity == null && newSelection != null)
+            if (SelectedEntity == null && newSelection != null)
             {
-                _selectedEntity = newSelection;
+                SelectedEntity = newSelection;
 
-                _selectedEntity.SelectionStatusChanged(true);
+                SelectedEntity.SelectionStatusChanged(true);
 
                 OnSelectionChanged?.Invoke(this, null, newSelection);
                 return;
             }
 
             // Changing from one entity to another
-            if (_selectedEntity != null && newSelection != null && _selectedEntity != newSelection)
+            if (SelectedEntity != null && newSelection != null && SelectedEntity != newSelection)
             {
-                SelectableEntity oldSelection = _selectedEntity;
-                _selectedEntity = newSelection;
+                SelectableEntity oldSelection = SelectedEntity;
+                SelectedEntity = newSelection;
 
                 oldSelection.SelectionStatusChanged(false);
                 newSelection.SelectionStatusChanged(true);
@@ -84,26 +97,26 @@ namespace GoodHub.Core.Runtime
             }
 
             // Deselecting the current entity
-            if (_selectedEntity != null && newSelection == null)
+            if (SelectedEntity != null && newSelection == null)
             {
-                SelectableEntity oldSelection = _selectedEntity;
-                _selectedEntity = null;
+                SelectableEntity oldSelection = SelectedEntity;
+                SelectedEntity = null;
 
                 oldSelection.SelectionStatusChanged(false);
 
                 OnSelectionChanged?.Invoke(this, oldSelection, null);
 
-                return;
+                // return;
             }
         }
 
         public void ClearSelection()
         {
-            if (_selectedEntity == null)
+            if (SelectedEntity == null)
                 return;
 
-            SelectableEntity oldSelectedEntity = _selectedEntity;
-            _selectedEntity = null;
+            SelectableEntity oldSelectedEntity = SelectedEntity;
+            SelectedEntity = null;
 
             oldSelectedEntity.SelectionStatusChanged(false);
 
@@ -114,7 +127,10 @@ namespace GoodHub.Core.Runtime
         {
             foreach (SelectableEntity entity in _allEntities)
             {
-                float entityDistanceFromSelectionPoint = Vector2.Distance(new Vector2(entity.transform.position.x, entity.transform.position.z), selectionPoint);
+                float entityDistanceFromSelectionPoint = Vector2.Distance(
+                    new Vector2(entity.transform.position.x, entity.transform.position.z),
+                    selectionPoint
+                );
 
                 if (entityDistanceFromSelectionPoint <= entity.SelectionRadius)
                 {

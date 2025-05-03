@@ -1,9 +1,13 @@
 using System;
 using JetBrains.Annotations;
-using UnityEngine;
 
 namespace GoodHub.Core.Runtime.Observables
 {
+    public interface IObservable
+    {
+        public string StringValue { get; }
+    }
+
     [NotNull]
     public abstract class Observable<T>
     {
@@ -11,7 +15,7 @@ namespace GoodHub.Core.Runtime.Observables
         private T _value;
 
         /// <summary>
-        /// Parameters are in the form of newValue, oldValue
+        /// Parameters are in the form of oldValue, newValue
         /// </summary>
         public event Action<T, T> OnValueChanged;
 
@@ -20,13 +24,12 @@ namespace GoodHub.Core.Runtime.Observables
             get => _value;
             set
             {
-                if (Equals(_value, value) == false)
-                {
-                    T oldValue = _value;
-                    _value = value;
-                    OnValueChanged?.Invoke(_value, oldValue);
-                    Debug.LogError($"ValueChanged {_value} {oldValue}");
-                }
+                if (Equals(_value, value))
+                    return;
+
+                T oldValue = _value;
+                _value = value;
+                OnValueChanged?.Invoke(oldValue, _value);
             }
         }
 
